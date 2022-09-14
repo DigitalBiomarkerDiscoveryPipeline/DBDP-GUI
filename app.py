@@ -1,5 +1,5 @@
 import dash
-from dash import html
+from dash import html, dcc
 import dash_bootstrap_components as dbc
 
 app = dash.Dash(
@@ -36,6 +36,7 @@ sidebar = dbc.Nav(
 app.layout = dbc.Container([
     navbar,
     html.Br(),
+
     # Sidebar and Pages
     dbc.Row([
         dbc.Col([
@@ -44,7 +45,11 @@ app.layout = dbc.Container([
         dbc.Col([
             dash.page_container
         ],  xs=8, sm=8, md=10, lg=10, xl=10, xxl=10)
-    ])
+    ]),
+
+    # Store user uploaded data
+    dcc.Store(id='data-store', storage_type='local'),
+    dcc.Store(id='filename', storage_type='local')
 ], fluid=True)
 
 

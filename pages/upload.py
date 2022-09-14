@@ -5,10 +5,13 @@ import dash
 from dash import html, dcc, dash_table, Input, Output, callback
 import dash_bootstrap_components as dbc
 import plotly.express as px
+from dash.exceptions import PreventUpdate
+import pandas as pd
+from sympy import true
 
 from func.preprocess import apple
 
-dash.register_page(__name__, name='Upload Data', path='/')
+dash.register_page(__name__, name='Upload Data', path='/', order=0)
 
 layout = html.Div(
     [
@@ -48,9 +51,25 @@ layout = html.Div(
 
 
         # Display Unfiltered ECG data
-        html.Div(id='apple-hr-plot')
+        html.Div(id='apple-hr-plot'),
+
+        # Navigate to processing
+        html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.H5('Looks good? Move on to', style={
+                        'display': 'inline-block', 'margin-right': '20px'},),
+                    dcc.Link(dbc.Button("Preprocessing"),
+                             href='/preprocessing'),
+                ]),
+            ], style={'float': 'right', 'margin': '50px 50px'})
+        ], hidden=True, id='proceed',)
+
+
     ]
 )
+
+# Store the uploaded dataframe to central storage after processing, also store the filename.
 
 
 def generate_df(contents):
@@ -67,10 +86,33 @@ def generate_df(contents):
     return df
 
 
-def parse_contents(contents, filename):
+@callback(
+    Output('data-store', 'data'),
+    Input('upload-data', 'contents')
+)
+def store_data(contents):
+    if contents is None:
+        raise PreventUpdate
 
     df = generate_df(contents)
 
+    return df.to_json()
+
+
+@callback(
+    Output('filename', 'data'),
+    Input('upload-data', 'filename')
+)
+def store_filename(filename):
+    if filename is None:
+        raise PreventUpdate
+
+    return {'filename': filename}
+
+
+# Use the stored user data to display data table and figure
+
+def generate_data_table(df, filename):
     return html.Div([
         html.H5(filename),
 
@@ -85,23 +127,24 @@ def parse_contents(contents, filename):
 @callback(
     Output('output-data-upload', 'children'),
     Output('apple-hr-plot', 'children'),
-    Input('upload-data', 'contents'),
-    Input('upload-data', 'filename'),
+    Output('proceed', 'hidden'),
+    Input('data-store', 'data'),
+    Input('filename', 'data')
 )
-def update_overview(content, filename):
-    if content is not None:
-        # Generate the datatable
-        table = parse_contents(content, filename)
+def update_overview(user_uploaded_data, filename):
 
-        # Generate the unfiltered ECG plot
-        df = generate_df(content)
-        fig = px.line(
-            x=df["Elapsed_time_(sec)"],
-            y=df["HR_Apple"],
-            title='Apple Watch Heart Rate Data',
-            labels=dict(x="Elapse Time (s)", y="Heart Rate")
-        )
-        fig = dcc.Graph(figure=fig)
+    df = pd.read_json(user_uploaded_data)
 
-        return table, fig
-    raise dash.exceptions.PreventUpdate
+    # Generate the datatable
+    table = generate_data_table(df, filename['filename'])
+
+    # Generate the unfiltered ECG plot
+    fig = px.line(
+        x=df["Elapsed_time_(sec)"],
+        y=df["HR_Apple"],
+        title='Apple Watch Heart Rate Data',
+        labels=dict(x="Elapse Time (s)", y="Heart Rate")
+    )
+    fig = dcc.Graph(figure=fig)
+
+    return table, fig, False
