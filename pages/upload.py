@@ -4,12 +4,8 @@ import io
 import dash
 from dash import html, dcc, dash_table, Input, Output, callback
 import dash_bootstrap_components as dbc
-import plotly.express as px
 from dash.exceptions import PreventUpdate
 import pandas as pd
-from sympy import true
-
-from func.preprocess import apple
 
 dash.register_page(__name__, name='Upload Data', path='/', order=0)
 
@@ -49,10 +45,6 @@ layout = html.Div(
         # Display the uploaded data as table
         html.Div(id='output-data-upload', style={'padding': '0 50px'}),
 
-
-        # Display Unfiltered ECG data
-        html.Div(id='apple-hr-plot'),
-
         # Navigate to processing
         html.Div([
             dbc.Row([
@@ -81,7 +73,7 @@ def generate_df(contents):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
 
-    df = apple(io.StringIO(decoded.decode('utf-8')))
+    df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
 
     return df
 
@@ -126,7 +118,6 @@ def generate_data_table(df, filename):
 
 @callback(
     Output('output-data-upload', 'children'),
-    Output('apple-hr-plot', 'children'),
     Output('proceed', 'hidden'),
     Input('data-store', 'data'),
     Input('filename', 'data')
@@ -138,13 +129,4 @@ def update_overview(user_uploaded_data, filename):
     # Generate the datatable
     table = generate_data_table(df, filename['filename'])
 
-    # Generate the unfiltered ECG plot
-    fig = px.line(
-        x=df["Elapsed_time_(sec)"],
-        y=df["HR_Apple"],
-        title='Apple Watch Heart Rate Data',
-        labels=dict(x="Elapse Time (s)", y="Heart Rate")
-    )
-    fig = dcc.Graph(figure=fig)
-
-    return table, fig, False
+    return table, False

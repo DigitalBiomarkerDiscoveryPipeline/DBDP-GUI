@@ -1,0 +1,17 @@
+Date: 7/17/19
+
+Baseline Start Empatica, Apple Watch, Biovotion, Faros:4:08
+Baseline Start Empatica, Fitbit, Biovotion, Faros:4:22
+Baseline Start Garmin, Miband, Biovotion, Faros: 4:38
+
+DB Start Empatica, Apple Watch, Biovotion, Faros:4:12
+DB Start Empatica, Fitbit, Biovotion, Faros:4:26
+DB Start Garmin, Miband, Biovotion, Faros:4:42
+
+Activity Start Empatica, Apple Watch, Biovotion, Faros:4:13
+Activity Start Empatica, Fitbit, Biovotion, Faros:4:27
+Activity Start Garmin, Miband, Biovotion, Faros:4:43
+
+Type Start Empatica, Apple Watch, Biovotion, Faros:4:19
+Type Start Empatica, Fitbit, Biovotion, Faros:4:34
+Type Start Garmin, Miband, Biovotion, Faros:4:49
