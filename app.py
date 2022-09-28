@@ -48,8 +48,8 @@ app.layout = dbc.Container([
     ]),
 
     # Store user uploaded data
-    dcc.Store(id='data-store', storage_type='memory'),
-    dcc.Store(id='filename', storage_type='memory')
+    dcc.Store(id='data-store', storage_type='local'),
+    dcc.Store(id='filename', storage_type='local')
 ], fluid=True)
 
 
