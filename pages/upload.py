@@ -51,8 +51,8 @@ layout = html.Div(
                 dbc.Col([
                     html.H5('Looks good? Move on to', style={
                         'display': 'inline-block', 'margin-right': '20px'},),
-                    dcc.Link(dbc.Button("Preprocessing"),
-                             href='/preprocessing'),
+                    dcc.Link(dbc.Button("Data Cleaning"),
+                             href='/data-cleaning'),
                 ]),
             ], style={'float': 'right', 'margin': '50px 50px'})
         ], hidden=True, id='proceed',)
