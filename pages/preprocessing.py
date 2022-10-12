@@ -50,6 +50,7 @@ layout = html.Div([
                             dbc.Col([
                                 dbc.Label("Columns to Modify:"),
                                 dcc.Dropdown(id="columns-to-modify",
+                                                multi=True,
                                                 placeholder="Which columns to modify.")                                
                             ]),
                             dbc.Col([
