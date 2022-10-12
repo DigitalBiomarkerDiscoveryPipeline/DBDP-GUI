@@ -5,15 +5,44 @@ import dash_bootstrap_components as dbc
 app = dash.Dash(
     __name__,
     use_pages=True,
-    external_stylesheets=[dbc.themes.ZEPHYR],
+    external_stylesheets=[dbc.themes.PULSE, dbc.icons.BOOTSTRAP],
 )
 
 # Navbar
-navbar = dbc.NavbarSimple(
-    brand="DBDP MakeCode",
-    brand_href="#",
-    color="primary",
-    dark='True'
+navbar = dbc.Navbar(
+    dbc.Container([   
+            dbc.Row(dbc.Col(html.A(html.Img(src="assets/dbdp-white-logo.png", className="nav-image"), href="https://dbdp.org/", target="_blank"))),
+            dbc.Row(dbc.Col(html.H1("Biomarker Development GUI", className="title"))),
+            # TODO change pill color once a color is settled
+            dbc.Row([
+                dbc.Col([
+                    dbc.Button(
+                        [html.I(className="bi bi-github home-icons"), "GitHub"],
+                        className="icons-button",
+                        size="sm",
+                        href="https://github.com/DigitalBiomarkerDiscoveryPipeline",
+                        target="_blank"
+                    ),            
+                    dbc.Button(
+                        [html.I(className="bi bi-twitter home-icons"), "DBDP ED"],
+                        className="icons-button",
+                        size="sm",
+                        href="https://medium.com/digital-biomarker-discovery",
+                        target="_blank"
+                    ), 
+                    dbc.Button(
+                        [html.I(className="bi bi-twitter home-icons"), "Open DBDP"],
+                        className="icons-button",
+                        size="sm",
+                        href="https://dbdp.org/opendbdp",
+                        target="_blank"
+                    ), 
+                ])
+            ]),
+        ],
+        fluid = True
+    ),
+    color = "primary"
 )
 
 # Sidebar
@@ -48,8 +77,8 @@ app.layout = dbc.Container([
     ]),
 
     # Store user uploaded data
-    dcc.Store(id='data-store', storage_type='local'),
-    dcc.Store(id='filename', storage_type='local')
+    dcc.Store(id='data-store', storage_type='memory'),
+    dcc.Store(id='filename', storage_type='memory')
 ], fluid=True)
 
 
