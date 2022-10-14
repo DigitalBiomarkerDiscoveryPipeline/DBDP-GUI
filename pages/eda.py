@@ -15,6 +15,23 @@ layout = html.Div(
             [
                 dbc.AccordionItem(
                     [
+                        dbc.Row([
+                            dbc.Col([
+                                dcc.Dropdown(
+                                    id='person-id-options',
+                                ),
+                            ]),
+                            dbc.Col([
+                                dcc.Dropdown(
+                                    ['Apple Watch', 'Empatica',
+                                     'Garmin', 'Fitbit', 'Miband', 'Biovotion'],
+                                    ['Apple Watch', 'Fitbit'],
+                                    multi=True,
+                                    id='wearable-options',
+                                ),
+                            ]),
+                        ]),
+
                         dcc.Graph(id='timeseries'),
                     ],
                     title="Explore Time Series"
@@ -62,40 +79,54 @@ def update_options(user_uploaded_data):
 
     return options, options
 
+
+@callback(
+    Output('person-id-options', 'options'),
+    Output('person-id-options', 'value'),
+    Input('data-store', 'data')
+)
+def update_options(user_uploaded_data):
+    df = pd.read_json(user_uploaded_data)
+
+    options = df['ID'].unique()
+    int_value = np.random.choice(options)
+
+    return options, int_value
+
 # Time Series Plots
 
 
-def draw_timeseries(df, comp_y, time_col, person_id, comp_x='', person_to_plot=[], random_choice=5, use_raw=True):
-    # df: dataframe to modify
-    # comp_y: numerical columns to plot
-    # person_id: name of the person_id column
-    # comp_x: column that becomes the gold standard (if user specifies)
-    # person_to_plot: list of participants to plot, max will be len == 5
-    # random_choice: number of random participants user would like to visualize
-    # use_raw: user should select whether to plot raw or interpolated data
+def draw_timeseries(df, time_col, standard, comp_y, person_to_plot):
 
-    if len(person_to_plot) == 0:
-        person_to_plot = np.random.choice(
-            df[person_id].unique(), random_choice, replace=False)
+    temp = df[df['ID'] == person_to_plot].copy()
+    comp_y = ['filled ' + y for y in comp_y]
+    temp = temp.sort_values(by=[time_col])
 
-    temp = df[df[person_id].isin(person_to_plot)].copy()
+    # ECG data plots
+    fig = px.line(temp, x=time_col, y=standard)
+    fig.data[0].line.color = 'grey'
+    fig.update_traces(opacity=0.3)
 
-    for c in person_to_plot:
-        temp = df[df[person_id] == c].copy()
-        fig = px.line(temp, x=time_col, y=comp_y)
+    # Add additional plots for selected wearbales
+    colors = px.colors.qualitative.Plotly[:len(comp_y)]
+    for i, y in enumerate(comp_y):
+        add_fig = px.line(temp, x=time_col, y=y)
+        add_fig.data[0].line.color = colors[i]
+        fig.add_trace(add_fig.data[0])
 
     return fig
 
 
 @callback(
     Output('timeseries', 'figure'),
-    Input('data-store', 'data')
+    Input('data-store', 'data'),
+    Input('person-id-options', 'value'),
+    Input('wearable-options', 'value')
 )
-def update_timeseries(user_uploaded_data):
+def update_timeseries(user_uploaded_data, person_id, wearables):
     df = pd.read_json(user_uploaded_data)
 
-    fig = draw_timeseries(df, ['Apple Watch', 'Fitbit', 'Miband'],
-                          'Elapsed Time', person_id='ID', random_choice=3)
+    fig = draw_timeseries(df, 'Elapsed Time', 'ECG', wearables, person_id)
 
     return fig
 
@@ -103,6 +134,8 @@ def update_timeseries(user_uploaded_data):
 
 
 def draw_correlation_plot(df, x, y):
+    x = 'filled ' + x
+    y = 'filled ' + y
     temp = df[[x, y]]
 
     fig = px.scatter(temp, x=x, y=y, trendline='ols')
