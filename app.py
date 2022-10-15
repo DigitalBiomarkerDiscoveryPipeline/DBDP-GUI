@@ -5,16 +5,24 @@ import dash_bootstrap_components as dbc
 app = dash.Dash(
     __name__,
     use_pages=True,
-    external_stylesheets=[dbc.themes.PULSE, dbc.icons.BOOTSTRAP],
+    external_stylesheets=[dbc.themes.ZEPHYR, dbc.icons.BOOTSTRAP],
 )
 
 # Navbar
 navbar = dbc.Navbar(
-    dbc.Container([   
-            dbc.Row(dbc.Col(html.A(html.Img(src="assets/dbdp-white-logo.png", className="nav-image"), href="https://dbdp.org/", target="_blank"))),
-            dbc.Row(dbc.Col(html.H1("Biomarker Development GUI", className="title"))),
-            # TODO change pill color once a color is settled
-            dbc.Row([
+    dbc.Container([
+        dbc.Row(
+            dbc.Col(
+                html.A(
+                    html.Img(
+                        src="assets/dbdp-white-logo.png",
+                        className="nav-image",
+                    ),
+                    href="https://dbdp.org/",
+                    target="_blank"))),
+
+        # TODO change pill color once a color is settled
+        dbc.Row([
                 dbc.Col([
                     dbc.Button(
                         [html.I(className="bi bi-github home-icons"), "GitHub"],
@@ -22,27 +30,28 @@ navbar = dbc.Navbar(
                         size="sm",
                         href="https://github.com/DigitalBiomarkerDiscoveryPipeline",
                         target="_blank"
-                    ),            
+                    ),
                     dbc.Button(
                         [html.I(className="bi bi-twitter home-icons"), "DBDP ED"],
                         className="icons-button",
                         size="sm",
                         href="https://medium.com/digital-biomarker-discovery",
                         target="_blank"
-                    ), 
+                    ),
                     dbc.Button(
-                        [html.I(className="bi bi-twitter home-icons"), "Open DBDP"],
+                        [html.I(className="bi bi-twitter home-icons"),
+                         "Open DBDP"],
                         className="icons-button",
                         size="sm",
                         href="https://dbdp.org/opendbdp",
                         target="_blank"
-                    ), 
+                    ),
                 ])
-            ]),
-        ],
-        fluid = True
+                ]),
+    ],
+        fluid=True
     ),
-    color = "primary"
+    color="primary"
 )
 
 # Sidebar
