@@ -18,7 +18,7 @@ layout = html.Div(
                         dbc.Row([
                             dbc.Col([
                                 dcc.Dropdown(
-                                    id='person-id-options',
+                                    id='person-id-options-ts',
                                 ),
                             ]),
                             dbc.Col([
@@ -112,6 +112,20 @@ def update_options(user_uploaded_data):
 
     return options, int_value
 
+
+@callback(
+    Output('person-id-options-ts', 'options'),
+    Output('person-id-options-ts', 'value'),
+    Input('data-store', 'data')
+)
+def update_options(user_uploaded_data):
+    df = pd.read_json(user_uploaded_data)
+
+    options = df['ID'].unique()
+    int_value = np.random.choice(options)
+
+    return options, int_value
+
 # Time Series Plots
 
 
@@ -144,7 +158,7 @@ def draw_timeseries(df, time_col, standard, comp_y, person_to_plot):
 @callback(
     Output('timeseries', 'figure'),
     Input('data-store', 'data'),
-    Input('person-id-options', 'value'),
+    Input('person-id-options-ts', 'value'),
     Input('wearable-options', 'value')
 )
 def update_timeseries(user_uploaded_data, person_id, wearables):
