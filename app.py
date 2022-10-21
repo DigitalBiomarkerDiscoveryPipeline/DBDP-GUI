@@ -6,6 +6,7 @@ app = dash.Dash(
     __name__,
     use_pages=True,
     external_stylesheets=[dbc.themes.ZEPHYR, dbc.icons.BOOTSTRAP],
+    suppress_callback_exceptions=True,
 )
 
 # Navbar
