@@ -11,6 +11,7 @@ dash.register_page(
 
 layout = html.Div(
     [
+        html.H3('Exploratory Data Analysis', style={'margin-bottom': '30px'}),
         dbc.Accordion(
             [
                 dbc.AccordionItem(
@@ -102,7 +103,7 @@ def update_options(user_uploaded_data):
 @callback(
     Output('person-id-options', 'options'),
     Output('person-id-options', 'value'),
-    Input('data-store', 'data')
+    Input('cleaned-data-store', 'data')
 )
 def update_options(user_uploaded_data):
     df = pd.read_json(user_uploaded_data)
@@ -116,7 +117,7 @@ def update_options(user_uploaded_data):
 @callback(
     Output('person-id-options-ts', 'options'),
     Output('person-id-options-ts', 'value'),
-    Input('data-store', 'data')
+    Input('cleaned-data-store', 'data')
 )
 def update_options(user_uploaded_data):
     df = pd.read_json(user_uploaded_data)
@@ -157,7 +158,7 @@ def draw_timeseries(df, time_col, standard, comp_y, person_to_plot):
 
 @callback(
     Output('timeseries', 'figure'),
-    Input('data-store', 'data'),
+    Input('cleaned-data-store', 'data'),
     Input('person-id-options-ts', 'value'),
     Input('wearable-options', 'value')
 )
@@ -183,7 +184,7 @@ def draw_correlation_plot(df, x, y):
 
 @callback(
     Output('correlation', 'figure'),
-    Input('data-store', 'data'),
+    Input('cleaned-data-store', 'data'),
     Input('y-options', 'value'),
     Input('x-options', 'value')
 )
@@ -201,7 +202,7 @@ def update_correlation(user_uploaded_data, y_axis, x_axis):
 
 @callback(
     Output('heatmap', 'figure'),
-    Input('data-store', 'data')
+    Input('cleaned-data-store', 'data')
 )
 def update_corr_table(user_uploaded_data):
     df = pd.read_json(user_uploaded_data)
@@ -233,7 +234,7 @@ def draw_error_plots(df, standard, wearables, error_type, person_id):
 
 @callback(
     Output('error_calc', 'figure'),
-    Input('data-store', 'data'),
+    Input('cleaned-data-store', 'data'),
     Input('error-type', 'value'),
     Input('person-id-options', 'value')
 )
