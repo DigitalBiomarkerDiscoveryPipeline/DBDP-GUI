@@ -8,111 +8,124 @@ from sympy import false
 dash.register_page(__name__, name='Data Cleaning',
                    path='/data-cleaning', order=1)
 
-layout = html.Div([   
-        # Data store to hold updated data
-        dcc.Store(id='cleaned-data-store', storage_type='local'),
+layout = html.Div([
+    # Headers
+    html.H1('Clean your dataset'),
+    html.H5('Edit the table directly / use the GUI buttons below.'),
 
-        # Headers
-        html.H1('Clean your dataset'),
-        html.H5('Edit the table directly / use the GUI buttons below.'),
+    # Data table
+    dash_table.DataTable(
+        id='data-table',
+        page_size=10,
+        editable=True,
+        sort_action='native',
+        sort_mode='single',
+        row_deletable=True,
+        column_selectable='multi',
+        page_action='native',
+        style_table={'overflowX': 'scroll'},
+        export_format='csv',
+        export_headers='display'),
 
-        # Data table
-        dash_table.DataTable(
-            id='data-table', 
-            page_size=10,
-            editable=True,
-            sort_action='native',
-            sort_mode='single',
-            row_deletable=True,
-            column_selectable='multi',
-            page_action='native',
-            style_table={'overflowX': 'scroll'},
-            export_format='csv',
-            export_headers='display'),
-
-        # User input for adding column 
-        html.Div([
-            dcc.Input(
-                id='add-column-value',
-                placeholder='Enter a column name...',
-                value='',
-                style={'padding': 10}
-            ),
-            html.Button('Add Column', id='add-column-button')
-        ], style={'height': 50}),
+    # User input for adding column
+    html.Div([
+        dcc.Input(
+            id='add-column-value',
+            placeholder='Enter a column name...',
+            value='',
+            style={'padding': 10}
+        ),
+        dbc.Button('Add Column', id='add-column-button')
+    ], style={'height': 50, 'margin-bottom': 30}),
 
 
-        # Table modification buttons 
-        html.Button('Add Row', id='add-row-button'),
-        html.Button('Fill Missing Values', id='fill-values-button', n_clicks=0),
-        html.Button('Save your updates', id='save'),
+    # Table modification buttons
+    html.Div([
+        dbc.Button('Add Row', id='add-row-button'),
+        dbc.Button('Fill Missing Values',
+                   id='fill-values-button', n_clicks=0),
+    ],
+        className='d-grid gap-3 d-md-flex justify-content-md-start',
+        style={'margin-bottom': 30}
+    ),
 
-        # Success message when save has been successful
-        html.Div([
-            html.P(
-                'Changes successfully saved',
-                id='save-success-message',
-                style={'display': 'none'}
-            )
-        ]),
 
-        # Modal Dialog for filling missing values
-        dbc.Modal(
-            [
-                dbc.ModalHeader(dbc.ModalTitle("Fill Missing Values")),
+    # Save updates
+    html.Div([
+        dbc.Button('Save your updates', id='save', color='success'),
+    ]),
 
-                dbc.ModalBody([
-                    dbc.Row([
-                            dbc.Col([
-                                dbc.Label("Person ID Column:"),
-                                dcc.Dropdown(id="person-id-value", 
-                                placeholder="The column that holds user ID."),
-                            ]),
-                            dbc.Col([
-                                dbc.Label("Method"),
-                                dcc.Dropdown(
-                                    id="method-value",
-                                    options=[
-                                        {"label": "Backfill", "value": 'backfill'},
-                                        {"label": "Forward Fill", "value": 'ffill'},
-                                        {"label": "Interpolate", "value": 'interpolate'},
-                                    ],
-                                    placeholder="The method of filling empty values.",
-                                ),
-                            ]),
+
+    # Success message when save has been successful
+    html.Div([
+        html.P(
+            'Changes successfully saved',
+            id='save-success-message',
+            style={'display': 'none'}
+        )
+    ]),
+
+    # Modal Dialog for filling missing values
+    dbc.Modal(
+        [
+            dbc.ModalHeader(dbc.ModalTitle("Fill Missing Values")),
+
+            dbc.ModalBody([
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Person ID Column:"),
+                        dcc.Dropdown(id="person-id-value",
+                                     placeholder="The column that holds user ID."),
                     ]),
-                    dbc.Row([
-                            dbc.Col([
-                                dbc.Label("Columns to Modify:"),
-                                dcc.Dropdown(id="columns-to-modify-value",
-                                                multi=True,
-                                                placeholder="Which columns to modify.")                                
-                            ]),
-                            dbc.Col([
-                                dbc.Label("Max Number of NaN values:"),
-                                dbc.Input(id="max-nan-values", 
-                                            type="number",
-                                            min = 1,
-                                            placeholder="If left empty, will fill in all NaN values")
-                            ]),
-                    ])
+                    dbc.Col([
+                        dbc.Label("Method"),
+                        dcc.Dropdown(
+                            id="method-value",
+                            options=[
+                                {"label": "Backfill", "value": 'backfill'},
+                                {"label": "Forward Fill",
+                                 "value": 'ffill'},
+                                {"label": "Interpolate",
+                                 "value": 'interpolate'},
+                            ],
+                            placeholder="The method of filling empty values.",
+                        ),
+                    ]),
                 ]),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Label("Columns to Modify:"),
+                        dcc.Dropdown(id="columns-to-modify-value",
+                                     multi=True,
+                                     placeholder="Which columns to modify.")
+                    ]),
+                    dbc.Col([
+                        dbc.Label("Max Number of NaN values:"),
+                        dbc.Input(id="max-nan-values",
+                                  type="number",
+                                  min=1,
+                                  placeholder="If left empty, will fill in all NaN values")
+                    ]),
+                ])
+            ]),
 
-                dbc.ModalFooter(
-                    dbc.Button(
-                        "Submit", id="fill-values-submit-button", className="ms-auto", n_clicks=0
-                    )
-                ),
-            ],
-            id="missing-values-modal",
-            is_open=False,
-            size="xl",
-        ), 
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Submit", id="fill-values-submit-button", className="ms-auto", n_clicks=0, color='primary'
+                )
+            ),
+        ],
+        id="missing-values-modal",
+        is_open=False,
+        size="xl",
+    ),
 ])
 
 ## Callbacks and Methods
 
 # Table Callbacks
+
+
 @callback(
     Output('data-table', 'data'),
     Output('data-table', 'columns'),
@@ -130,9 +143,9 @@ layout = html.Div([
     State('data-table', 'columns')
 )
 def display_data_table(data_source_data, add_row_button_click, add_column_button_click,
-                            fill_value_button_click, fill_value_submit_button_click, add_column_value, 
-                            person_id_value, method_value, columns_to_modify_value, max_nan_values,
-                            table_rows, table_columns):
+                       fill_value_button_click, fill_value_submit_button_click, add_column_value,
+                       person_id_value, method_value, columns_to_modify_value, max_nan_values,
+                       table_rows, table_columns):
     '''
         Displays and modifies data table contents based on user input. 
 
@@ -146,8 +159,9 @@ def display_data_table(data_source_data, add_row_button_click, add_column_button
         # Case when page has just loaded
         df = pd.read_json(data_source_data)
         data = df.to_dict('records')
-        columns = [{'name': i, 'id': i, 'renamable': True,'deletable': True } for i in df.columns]
-        return data, columns 
+        columns = [{'name': i, 'id': i, 'renamable': True,
+                    'deletable': True} for i in df.columns]
+        return data, columns
     elif triggered_id == 'add-row-button':
         # Case when add row button has been clicked
         table_rows.append({c['id']: '' for c in table_columns})
@@ -155,7 +169,7 @@ def display_data_table(data_source_data, add_row_button_click, add_column_button
     elif triggered_id == 'add-column-button':
         # Case when add column button has been clicked
         table_columns.append({
-            'id': add_column_value, 'name': add_column_value, 
+            'id': add_column_value, 'name': add_column_value,
             'renamable': True, 'deletable': True
         })
         return table_rows, table_columns
@@ -163,12 +177,15 @@ def display_data_table(data_source_data, add_row_button_click, add_column_button
         # Case when fill missing values form is being filled out
         df = pd.DataFrame.from_records(table_rows)
         df = column_categorization(df)
-        new_df = fill_missing_values(df, person_id_value, how=method_value, columns=columns_to_modify_value, limit_n=max_nan_values)
+        new_df = fill_missing_values(
+            df, person_id_value, how=method_value, columns=columns_to_modify_value, limit_n=max_nan_values)
         data = new_df.to_dict('records')
-        columns = [{'name': i, 'id': i, 'renamable': True,'deletable': True } for i in new_df.columns]
-        return data, columns 
+        columns = [{'name': i, 'id': i, 'renamable': True,
+                    'deletable': True} for i in new_df.columns]
+        return data, columns
     else:
         raise PreventUpdate
+
 
 @callback(
     Output('cleaned-data-store', 'data'),
@@ -184,16 +201,17 @@ def save_data_table_to_store(data, save_button_click):
         # Convert data-table to json
         df = pd.DataFrame.from_records(data)
         output_json = df.to_json()
-        print(output_json)
         return output_json, {'display': 'block'}
     else:
         raise PreventUpdate
 
 # Modal Callbacks
 
+
 @callback(
     Output('missing-values-modal', 'is_open'),
-    [Input('fill-values-button', 'n_clicks'), Input("fill-values-submit-button", "n_clicks")],
+    [Input('fill-values-button', 'n_clicks'),
+     Input("fill-values-submit-button", "n_clicks")],
     State('missing-values-modal', 'is_open'),
 )
 def toggle_missing_values_modal(file_values_button, fill_values_submit_button, is_open):
@@ -203,6 +221,7 @@ def toggle_missing_values_modal(file_values_button, fill_values_submit_button, i
     if file_values_button or fill_values_submit_button:
         return not is_open
     return is_open
+
 
 @callback(
     Output('person-id-value', 'options'),
@@ -215,7 +234,7 @@ def get_column_names(fill_missing_values_button_click, columns, person_id_value)
     '''
         Returns columns of dataframe for use in modal dropdown
     '''
-    
+
     if fill_missing_values_button_click > 0:
         return_list = [{'label': c['id'], 'value': c['id']} for c in columns]
         return return_list, return_list
@@ -224,10 +243,11 @@ def get_column_names(fill_missing_values_button_click, columns, person_id_value)
 
 # Helper functions
 
+
 def fill_missing_values(df, person_id_col, how, columns, limit_n):
     '''
         Used to fill missing values in dataframe.
-        
+
         df: dataframe to modify
         person_id_col: name of the person_id column
         how: users can choose from the following-- bfill, ffill, interpolate
@@ -245,6 +265,7 @@ def fill_missing_values(df, person_id_col, how, columns, limit_n):
         temp[new_columns] = temp.groupby(person_id_col)[
             columns].fillna(method=how, limit=limit_n)
     return temp
+
 
 def column_categorization(df):
     '''
