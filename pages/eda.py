@@ -65,9 +65,9 @@ layout = html.Div(
                         dbc.Row([
                             dbc.Col([
                                 dcc.Dropdown(
-                                    ['Mean Directional Error',
-                                        'Mean Absolute Error'],
-                                    'Mean Directional Error',
+                                    ['Directional Error',
+                                        'Absolute Error'],
+                                    'Directional Error',
                                     id='error-type'
                                 )
                             ]),
@@ -108,10 +108,10 @@ def update_options(user_uploaded_data):
 def update_options(user_uploaded_data):
     df = pd.read_json(user_uploaded_data)
 
-    options = df['ID'].unique()
-    int_value = np.random.choice(options)
+    options = np.append('Select All', df['ID'].unique())
+    #int_value = np.random.choice(options)
 
-    return options, int_value
+    return options, 'Select All'
 
 
 @callback(
@@ -219,15 +219,33 @@ def update_corr_table(user_uploaded_data):
 
 
 def draw_error_plots(df, standard, wearables, error_type, person_id):
-    df = df[df['ID'] == person_id]
-    mde = df[wearables].sub(df[standard], axis=0)
-    mae = abs(mde.copy())
-    if error_type == 'Mean Directional Error':
-        fig = px.box(mde, y=wearables, labels={
-                     'value': error_type})
+
+    if person_id == 'Select All':
+        mde = df[wearables].sub(df[standard], axis=0)
+        mae = abs(mde.copy())
+        mde = pd.concat([df[['ID']], mde], axis=1)
+        mde_output = mde.groupby('ID').mean().reset_index()
+
+        mae = pd.concat([df[['ID']], mae], axis=1)
+        mae_output = mae.groupby('ID').mean().reset_index()
+        if error_type == 'Directional Error':
+            fig = px.box(mde_output, y=wearables, labels={
+                         'value': f'Mean {error_type}'})
+        else:
+            fig = px.box(mae_output, y=wearables, labels={
+                         'value': f'Mean {error_type}'})
+
     else:
-        fig = px.box(mae, y=wearables, labels={
-                     'value': error_type})
+
+        df = df[df['ID'] == person_id]
+        de = df[wearables].sub(df[standard], axis=0)
+        ae = abs(de.copy())
+        if error_type == 'Directional Error':
+            fig = px.box(de, y=wearables, labels={
+                'value': error_type})
+        else:
+            fig = px.box(ae, y=wearables, labels={
+                'value': error_type})
 
     return fig
 
