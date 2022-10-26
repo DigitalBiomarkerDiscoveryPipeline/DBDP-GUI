@@ -130,6 +130,7 @@ layout = html.Div([
     Output('data-table', 'data'),
     Output('data-table', 'columns'),
     Input('data-store', 'data'),
+    Input('cleaned-data-store', 'data'),
     Input('add-row-button', 'n_clicks'),
     Input('add-column-button', 'n_clicks'),
     Input('fill-values-button', 'n_clicks'),
@@ -142,7 +143,7 @@ layout = html.Div([
     State('data-table', 'data'),
     State('data-table', 'columns')
 )
-def display_data_table(data_source_data, add_row_button_click, add_column_button_click,
+def display_data_table(data_store_data, cleaned_data_store_data, add_row_button_click, add_column_button_click,
                        fill_value_button_click, fill_value_submit_button_click, add_column_value,
                        person_id_value, method_value, columns_to_modify_value, max_nan_values,
                        table_rows, table_columns):
@@ -157,7 +158,10 @@ def display_data_table(data_source_data, add_row_button_click, add_column_button
 
     if triggered_id == None:
         # Case when page has just loaded
-        df = pd.read_json(data_source_data)
+        if cleaned_data_store_data != None:
+            df = pd.read_json(cleaned_data_store_data)
+        else:
+            df = pd.read_json(data_store_data)
         data = df.to_dict('records')
         columns = [{'name': i, 'id': i, 'renamable': True,
                     'deletable': True} for i in df.columns]
@@ -186,7 +190,6 @@ def display_data_table(data_source_data, add_row_button_click, add_column_button
     else:
         raise PreventUpdate
 
-
 @callback(
     Output('cleaned-data-store', 'data'),
     Output('save-success-message', 'style'),
@@ -206,7 +209,6 @@ def save_data_table_to_store(data, save_button_click):
         raise PreventUpdate
 
 # Modal Callbacks
-
 
 @callback(
     Output('missing-values-modal', 'is_open'),
