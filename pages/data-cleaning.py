@@ -194,15 +194,24 @@ def display_data_table(data_store_data, cleaned_data_store_data, add_row_button_
     Output('cleaned-data-store', 'data'),
     Output('save-success-message', 'style'),
     Input('data-table', 'data'),
+    Input('data-table', 'columns'),
     Input('save', 'n_clicks'),
 )
-def save_data_table_to_store(data, save_button_click):
+def save_data_table_to_store(data, columns, save_button_click):
     '''
         On save changes button click, saves data to local data store
     '''
     if save_button_click != None and save_button_click > 0:
+        # Get columns from columns dict in data-table
+        column_list = []
+        for c in columns:
+            column_list.append(c['name'])
+        
+        # TODO: a ValueError should be raised here if column names are the same
+        # ValueError: DataFrame columns must be unique for orient='columns'.
+
         # Convert data-table to json
-        df = pd.DataFrame.from_records(data)
+        df = pd.DataFrame.from_records(data, columns=column_list)
         output_json = df.to_json()
         return output_json, {'display': 'block'}
     else:
