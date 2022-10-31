@@ -10,5 +10,5 @@ The functions provided are sourced directly from the DBDP - https://github.com/D
 
 1. Clone the repository from main. 
 2. Navigate to the repository in your local terminal. 
-3. Install appropriate dependencies using pip - pip install -r requirements.txt
-4. Run the app using Python - python app.py
+3. Install appropriate dependencies using pip: pip install -r requirements.txt
+4. Run the app using Python: python app.py
