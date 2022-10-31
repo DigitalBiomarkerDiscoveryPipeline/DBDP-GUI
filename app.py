@@ -16,7 +16,7 @@ navbar = dbc.Navbar(
             dbc.Col(
                 html.A(
                     html.Img(
-                        src="assets/dbdp-white-logo.png",
+                        src="assets/dbdp-logo-white.png",
                         className="nav-image",
                     ),
                     href="https://dbdp.org/",
@@ -33,14 +33,15 @@ navbar = dbc.Navbar(
                         target="_blank"
                     ),
                     dbc.Button(
-                        [html.I(className="bi bi-twitter home-icons"), "DBDP ED"],
+                        [html.I(
+                            className="bi bi-medium home-icons"), "DBDP ED"],
                         className="icons-button",
                         size="sm",
                         href="https://medium.com/digital-biomarker-discovery",
                         target="_blank"
                     ),
                     dbc.Button(
-                        [html.I(className="bi bi-twitter home-icons"),
+                        [html.I(className="bi bi-box-arrow-up-right home-icons"),
                          "Open DBDP"],
                         className="icons-button",
                         size="sm",
@@ -87,11 +88,11 @@ app.layout = dbc.Container([
     ]),
 
     # Store user uploaded data
-    dcc.Store(id='data-store', storage_type='local'),
-    dcc.Store(id='filename', storage_type='local'),
+    dcc.Store(id='data-store', storage_type='session'),
+    dcc.Store(id='filename', storage_type='session'),
 
     # Data store to hold updated data
-    dcc.Store(id='cleaned-data-store', storage_type='local'),
+    dcc.Store(id='cleaned-data-store', storage_type='session'),
 ], fluid=True)
 
 

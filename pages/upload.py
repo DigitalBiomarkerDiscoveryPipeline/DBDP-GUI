@@ -14,30 +14,43 @@ layout = html.Div(
 
         dbc.Row([
             dbc.Col([
-                html.H3('Welcome! Start by Uploading Data')
+                html.H3('Upload Data')
             ], width='auto')
-        ], justify='center'),
+        ], justify='start'),
 
         # Allow user to upload data
         dbc.Row([
             dbc.Col([
-                dcc.Upload(
-                    id='upload-data',
-                    children=html.Div([
-                        'Drag and Drop or ',
-                        html.A('Select Files', className='link-primary')
-                    ]),
-                    style={
-                        'width': '100%',
-                        'height': '60px',
-                        'lineHeight': '60px',
-                        'borderWidth': '1px',
-                        'borderStyle': 'dashed',
-                        'borderRadius': '5px',
-                        'textAlign': 'center',
-                        'margin': '10px'
-                    },
-                )
+                html.Div([
+                    dcc.Upload(
+                         id='upload-data',
+                         children=html.Div([
+                             html.Img(src='assets/file_upload_icon.png',
+                                      alt='file_upload',
+                                      style={'height': '20%',
+                                             'width': '20%',
+                                             'margin': '50px 10px'}
+                                      ),
+                             html.Br(),
+                             'Drag and Drop or ',
+                             html.A('Select Files',
+                                    className='link-primary')
+                         ]),
+                         style={
+                             'width': '800px',
+                             'height': '400px',
+                             'lineHeight': '60px',
+                             'borderWidth': '3px',
+                             'backgroundColor': '#f4f6fe',
+                             'borderColor': '#c6c6c6',
+                             'borderStyle': 'dashed',
+                             'borderRadius': '10px',
+                             'textAlign': 'center',
+                             'margin': '100px 50px'
+                         },
+                         )
+                ], id='upload-container')
+
             ], width='auto')
 
         ], justify='center'),
@@ -113,12 +126,13 @@ def generate_data_table(df, filename):
             [{'name': i, 'id': i} for i in df.columns],
             page_size=8,
         )
-    ])
+    ], style={'margin-top': 50})
 
 
 @callback(
     Output('output-data-upload', 'children'),
     Output('proceed', 'hidden'),
+    Output('upload-container', 'hidden'),
     Input('data-store', 'data'),
     Input('filename', 'data')
 )
@@ -129,4 +143,4 @@ def update_overview(user_uploaded_data, filename):
     # Generate the datatable
     table = generate_data_table(df, filename['filename'])
 
-    return table, False
+    return table, False, True
