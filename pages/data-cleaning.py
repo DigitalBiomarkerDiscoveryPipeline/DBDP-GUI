@@ -10,38 +10,47 @@ dash.register_page(__name__, name='Data Cleaning',
 
 layout = html.Div([
     # Headers
-    html.H1('Clean your dataset'),
-    html.H5('Edit the table directly / use the GUI buttons below.'),
+    html.H3('Data Preprocessing'),
+    html.H5(
+        'Modify your dataset by editing the table directly or using an action button.'),
 
-    # Data table
-    dash_table.DataTable(
-        id='data-table',
-        page_size=10,
-        editable=True,
-        sort_action='native',
-        sort_mode='single',
-        row_deletable=True,
-        column_selectable='multi',
-        page_action='native',
-        style_table={'overflowX': 'scroll'},
-        export_format='csv',
-        export_headers='display'),
+    html.Div([
+        # Data table
+        dash_table.DataTable(
+            id='data-table',
+            page_size=10,
+            editable=True,
+            sort_action='native',
+            sort_mode='single',
+            row_deletable=True,
+            column_selectable='multi',
+            page_action='native',
+            style_table={'overflowX': 'scroll'},
+            export_format='csv',
+            export_headers='display'),
+    ], style={'margin-top': 30}),
+
 
     # User input for adding column
     html.Div([
+
         dcc.Input(
             id='add-column-value',
             placeholder='Enter a column name...',
             value='',
             style={'padding': 10}
         ),
-        dbc.Button('Add Column', id='add-column-button')
+        dbc.Button('Add Column', id='add-column-button',
+                   style={'margin': 15}),
+
+
+        dbc.Button('Add Row', id='add-row-button'),
     ], style={'height': 50, 'margin-bottom': 30}),
 
 
     # Table modification buttons
     html.Div([
-        dbc.Button('Add Row', id='add-row-button'),
+
         dbc.Button('Fill Missing Values',
                    id='fill-values-button', n_clicks=0),
     ],
@@ -49,21 +58,32 @@ layout = html.Div([
         style={'margin-bottom': 30}
     ),
 
+    dbc.Row([
+        dbc.Col([
+            # Save updates
+            dbc.Button('Save your updates', id='save',
+                       color='success', outline=True),
+            # Success message when save has been successful
+            html.Div([
+                html.P(
+                    'Changes successfully saved!',
+                    id='save-success-message',
+                    style={'display': 'none'}
+                )
+            ], style={'margin-top': 5}),
+        ]),
+        dbc.Col([
+            html.Div([
 
-    # Save updates
-    html.Div([
-        dbc.Button('Save your updates', id='save', color='success'),
-    ]),
+                html.H5('Looks good? Move on to', style={
+                    'display': 'inline-block', 'margin-right': '20px'},),
+                dcc.Link(dbc.Button("Data Analysis"),
+                         href='/eda'),
 
+            ], hidden=True, style={'margin-right': 30}, id='nav-to-eda')
+        ], width='auto')
+    ], justify='between'),
 
-    # Success message when save has been successful
-    html.Div([
-        html.P(
-            'Changes successfully saved',
-            id='save-success-message',
-            style={'display': 'none'}
-        )
-    ]),
 
     # Modal Dialog for filling missing values
     dbc.Modal(
@@ -190,9 +210,11 @@ def display_data_table(data_store_data, cleaned_data_store_data, add_row_button_
     else:
         raise PreventUpdate
 
+
 @callback(
     Output('cleaned-data-store', 'data'),
     Output('save-success-message', 'style'),
+    Output('nav-to-eda', 'hidden'),
     Input('data-table', 'data'),
     Input('data-table', 'columns'),
     Input('save', 'n_clicks'),
@@ -206,18 +228,19 @@ def save_data_table_to_store(data, columns, save_button_click):
         column_list = []
         for c in columns:
             column_list.append(c['name'])
-        
+
         # TODO: a ValueError should be raised here if column names are the same
         # ValueError: DataFrame columns must be unique for orient='columns'.
 
         # Convert data-table to json
         df = pd.DataFrame.from_records(data, columns=column_list)
         output_json = df.to_json()
-        return output_json, {'display': 'block'}
+        return output_json, {'display': 'block'}, False
     else:
         raise PreventUpdate
 
 # Modal Callbacks
+
 
 @callback(
     Output('missing-values-modal', 'is_open'),
