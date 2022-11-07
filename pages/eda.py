@@ -94,8 +94,7 @@ layout = html.Div(
 )
 def update_options(user_uploaded_data):
     df = pd.read_json(user_uploaded_data)
-
-    options = df.columns[1:8]
+    options = df.columns[0:8]
 
     return options, options
 

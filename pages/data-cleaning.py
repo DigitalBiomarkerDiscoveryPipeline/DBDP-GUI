@@ -202,7 +202,7 @@ def display_data_table(data_store_data, cleaned_data_store_data, add_row_button_
         df = pd.DataFrame.from_records(table_rows)
         df = column_categorization(df)
         new_df = fill_missing_values(
-            df, person_id_value, how=method_value, columns=columns_to_modify_value, limit_n=max_nan_values)
+            df, person_id_value, how=method_value, columns=columns_to_modify_value)
         data = new_df.to_dict('records')
         columns = [{'name': i, 'id': i, 'renamable': True,
                     'deletable': True} for i in new_df.columns]
@@ -278,7 +278,7 @@ def get_column_names(fill_missing_values_button_click, columns, person_id_value)
 # Helper functions
 
 
-def fill_missing_values(df, person_id_col, how, columns, limit_n):
+def fill_missing_values(df, person_id_col, how, columns, limit_n=15):
     '''
         Used to fill missing values in dataframe.
 
