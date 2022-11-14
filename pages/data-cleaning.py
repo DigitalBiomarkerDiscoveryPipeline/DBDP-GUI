@@ -3,7 +3,6 @@ import pandas as pd
 from dash import html, dcc, callback, Input, Output, State, dash_table, ctx
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
-from sympy import false
 
 dash.register_page(__name__, name='Data Cleaning',
                    path='/data-cleaning', order=1)
